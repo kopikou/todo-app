@@ -21,7 +21,6 @@ def test_get_todos_api(client):
     assert response.is_json
 
 def test_delete_todo(client):
-    # Очищаем список перед тестом
     from app import todos
     todos.clear()
 
