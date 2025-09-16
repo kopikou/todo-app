@@ -13,7 +13,7 @@ def test_index_page(client):
 
 def test_add_todo(client):
     response = client.post('/add', data={'todo': 'Test task'})
-    assert response.status_code == 302  # Redirect
+    assert response.status_code == 302 
 
 def test_get_todos_api(client):
     response = client.get('/api/todos')
