@@ -18,6 +18,7 @@
                 <a href="/complete/{{ todo.id }}">
                     {% if todo.done %}Undo{% else %}Complete{% endif %}
                 </a>
+                <a href="/delete/{{ todo.id }}" style="color: red; margin-left: 10px;">Delete</a>
             </li>
         {% endfor %}
     </ul>

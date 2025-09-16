@@ -19,3 +19,15 @@ def test_get_todos_api(client):
     response = client.get('/api/todos')
     assert response.status_code == 200
     assert response.is_json
+
+def test_delete_todo(client):
+    # Сначала добавляем задачу
+    client.post('/add', data={'todo': 'Task to delete'})
+    
+    # Удаляем первую задачу
+    response = client.get('/delete/1')
+    assert response.status_code == 302
+    
+    # Проверяем, что задач нет
+    response = client.get('/api/todos')
+    assert len(response.get_json()) == 0
