@@ -24,8 +24,13 @@ def test_delete_todo(client):
     # Сначала добавляем задачу
     client.post('/add', data={'todo': 'Task to delete'})
     
-    # Удаляем первую задачу
-    response = client.get('/delete/1')
+    # Получаем актуальный список задач
+    response = client.get('/api/todos')
+    tasks = response.get_json()
+    
+    # Удаляем последнюю добавленную задачу
+    last_task_id = tasks[-1]['id'] if tasks else None
+    response = client.get(f'/delete/{last_task_id}')
     assert response.status_code == 302
     
     # Проверяем, что задач нет
