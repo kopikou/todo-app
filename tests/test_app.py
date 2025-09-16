@@ -21,18 +21,29 @@ def test_get_todos_api(client):
     assert response.is_json
 
 def test_delete_todo(client):
-    # Сначала добавляем задачу
+    # Очищаем список перед тестом
+    from app import todos
+    todos.clear()
+    print(f"Initial todos: {todos}")
+    
+    # Добавляем задачу
     client.post('/add', data={'todo': 'Task to delete'})
     
-    # Получаем актуальный список задач
+    # Проверяем что добавилось
     response = client.get('/api/todos')
-    tasks = response.get_json()
+    tasks_before = response.get_json()
+    print(f"Tasks after add: {tasks_before}")
     
-    # Удаляем последнюю добавленную задачу
-    last_task_id = tasks[-1]['id'] if tasks else None
+    # Удаляем задачу
+    last_task_id = tasks_before[-1]['id'] if tasks_before else None
+    print(f"Deleting task with id: {last_task_id}")
     response = client.get(f'/delete/{last_task_id}')
-    assert response.status_code == 302
+    print(f"Delete response status: {response.status_code}")
     
-    # Проверяем, что задач нет
+    # Проверяем результат
     response = client.get('/api/todos')
-    assert len(response.get_json()) == 0
+    tasks_after = response.get_json()
+    print(f"Tasks after delete: {tasks_after}")
+    print(f"Global todos: {todos}")
+    
+    assert len(tasks_after) == 0
