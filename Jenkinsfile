@@ -2,9 +2,9 @@ pipeline {
     agent any
     
     environment {
-        PYTHON_PATH = 'C:\\Users\\Kopikou\\Desktop\\study\\Devops\\todo-app\\.conda\\python.exe'
-        PROJECT_PATH = 'C:\\Users\\Kopikou\\Desktop\\study\\Devops\\todo-app'
-        PRODUCTION_PATH = 'C:\\Users\\Kopikou\\Desktop\\study\\Devops\\todo-app-production'
+        PYTHON_PATH = 'C:\\Users\\Kopikou\\Desktop\\study\\Devops\\todo-application\\.conda\\python.exe'
+        PROJECT_PATH = 'C:\\Users\\Kopikou\\Desktop\\study\\Devops\\todo-application'
+        PRODUCTION_PATH = 'C:\\Users\\Kopikou\\Desktop\\study\\Devops\\todo-application-production'
     }
     
     stages {
@@ -27,7 +27,7 @@ pipeline {
         
         stage('Test Report for Dev') {
             when {
-                branch 'dev'
+                expression { env.GIT_BRANCH == 'origin/dev' }
             }
             steps {
                 echo "Generating test report for dev branch..."
@@ -40,7 +40,7 @@ pipeline {
         
         stage('Deploy to Production') {
             when {
-                branch 'main'
+                expression { env.GIT_BRANCH == 'origin/main' }
             }
             steps {
                 echo "Deploying to production..."
@@ -66,6 +66,7 @@ pipeline {
                     echo "CI process completed successfully for dev branch"
                 } else if (env.GIT_BRANCH == 'origin/main') {
                     echo "CD process completed successfully for main branch"
+                }
             }
         }
         failure {
