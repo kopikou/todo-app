@@ -27,7 +27,7 @@ pipeline {
         
         stage('Test Report for Dev') {
             when {
-                branch 'dev'
+                expression { env.GIT_BRANCH == 'origin/dev' }
             }
             steps {
                 echo "Generating test report for dev branch..."
@@ -40,7 +40,7 @@ pipeline {
         
         stage('Deploy to Production') {
             when {
-                branch 'main'
+                expression { env.GIT_BRANCH == 'origin/main' }
             }
             steps {
                 echo "Deploying to production..."
