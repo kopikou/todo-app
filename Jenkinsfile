@@ -2,9 +2,9 @@ pipeline {
     agent any
     
     environment {
-        PYTHON_PATH = 'C:\\Users\\Kopikou\\Desktop\\study\\Devops\\todo-application\\.conda\\python.exe'
-        PROJECT_PATH = 'C:\\Users\\Kopikou\\Desktop\\study\\Devops\\todo-application'
-        PRODUCTION_PATH = 'C:\\Users\\Kopikou\\Desktop\\study\\Devops\\todo-application-production'
+        PYTHON_PATH = 'C:\\Users\\Kopikou\\Desktop\\study\\Devops\\todo-app\\.conda\\python.exe'
+        PROJECT_PATH = 'C:\\Users\\Kopikou\\Desktop\\study\\Devops\\todo-app'
+        PRODUCTION_PATH = 'C:\\Users\\Kopikou\\Desktop\\study\\Devops\\todo-app-production'
     }
     
     stages {
