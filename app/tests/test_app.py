@@ -1,10 +1,15 @@
 import pytest
-from app import app
+#from app.app import app
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
+from app.app import app
 
 @pytest.fixture
 def client():
     # Очищаем задачи перед каждым тестом
-    from app import todos
+    from app.app import todos
     todos.clear()
     with app.test_client() as client:
         yield client
