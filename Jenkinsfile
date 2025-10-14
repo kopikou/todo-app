@@ -116,7 +116,7 @@ pipeline {
                 echo "Running integration tests..."
                 script {
                     // Ждем пока приложение поднимется
-                    bat 'timeout /t 30 /nobreak'
+                    bat 'timeout /t 45 /nobreak'
                     
                     // Проверяем доступность приложения
                     bat """
