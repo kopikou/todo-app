@@ -116,7 +116,7 @@ pipeline {
                 echo "Running integration tests..."
                 script {
                     // Ждем пока приложение поднимется
-                    bat 'timeout /t 45 /nobreak'
+                    bat 'ping -n 30 127.0.0.1 > nul'
                     
                     // Проверяем статус контейнеров
                     bat 'docker-compose ps'
@@ -131,6 +131,10 @@ pipeline {
                     ) || (
                         echo "Application not ready yet, but continuing deployment"
                     )
+                    """
+                    bat """
+                    curl -f http://localhost:80/ || exit /b 1
+                    curl -f http://localhost:80/api/todos || exit /b 1
                     """
                 }
             }
