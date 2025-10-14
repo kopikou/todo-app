@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: todo-app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+    restart: unless-stopped
+    networks:
+      - todo-network
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    container_name: todo-nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+    restart: unless-stopped
+    networks:
+      - todo-network
+
+networks:
+  todo-network:
+    driver: bridge
