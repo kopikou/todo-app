@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        DOCKER_REGISTRY = 'docker.io/kopikou'  // Например: docker.io/yourusername
+        DOCKER_REGISTRY = 'docker.io/kopikou'  
         PROJECT_NAME = 'todo-app'
     }
     
@@ -19,10 +19,14 @@ pipeline {
                 echo "Building Docker images..."
                 script {
                     // Сборка образа приложения
-                    sh "docker build -t ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-app:${env.BUILD_NUMBER} ."
+                    bat """
+                    docker build -t ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-app:${env.BUILD_NUMBER} .
+                    """
                     
                     // Сборка образа nginx
-                    sh "docker build -t ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-nginx:${env.BUILD_NUMBER} -f Dockerfile.nginx ."
+                    bat """
+                    docker build -t ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-nginx:${env.BUILD_NUMBER} -f Dockerfile.nginx .
+                    """
                 }
             }
         }
@@ -32,12 +36,27 @@ pipeline {
                 echo "Running unit tests in container..."
                 script {
                     // Запуск тестов в контейнере
-                    sh """
-                    docker run --rm \
-                        ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-app:${env.BUILD_NUMBER} \
+                    bat """
+                    docker run --rm ^
+                        ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-app:${env.BUILD_NUMBER} ^
                         python -m pytest tests/ -v
                     """
                 }
+            }
+        }
+        
+        stage('Test Report for Dev') {
+            when {
+                expression { env.GIT_BRANCH == 'origin/dev' }
+            }
+            steps {
+                echo "Generating test report for dev branch..."
+                bat """
+                    docker run --rm ^
+                        ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-app:${env.BUILD_NUMBER} ^
+                        python -m pytest tests/ -v > test-report.txt
+                """
+                archiveArtifacts artifacts: 'test-report.txt', fingerprint: true
             }
         }
         
@@ -53,8 +72,8 @@ pipeline {
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                     )]) {
-                        sh """
-                        docker login -u $DOCKER_USER -p $DOCKER_PASS ${env.DOCKER_REGISTRY}
+                        bat """
+                        docker login -u %DOCKER_USER% -p %DOCKER_PASS% ${env.DOCKER_REGISTRY}
                         docker push ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-app:${env.BUILD_NUMBER}
                         docker push ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-nginx:${env.BUILD_NUMBER}
                         
@@ -76,9 +95,9 @@ pipeline {
             steps {
                 echo "Deploying to production..."
                 script {
-                    sh """
+                    bat """
                     // Останавливаем и удаляем старые контейнеры
-                    docker-compose down || true
+                    docker-compose down || echo "No running containers found"
                     
                     // Запускаем новые контейнеры
                     docker-compose up -d
@@ -97,12 +116,12 @@ pipeline {
                 echo "Running integration tests..."
                 script {
                     // Ждем пока приложение поднимется
-                    sh 'sleep 30'
+                    bat 'timeout /t 30 /nobreak'
                     
                     // Проверяем доступность приложения
-                    sh """
-                    curl -f http://localhost:80/ || exit 1
-                    curl -f http://localhost:80/api/todos || exit 1
+                    bat """
+                    curl -f http://localhost:80/ || exit /b 1
+                    curl -f http://localhost:80/api/todos || exit /b 1
                     """
                 }
             }
@@ -115,9 +134,9 @@ pipeline {
             script {
                 // Очистка: удаляем локальные образы для экономии места
                 if (env.GIT_BRANCH != 'origin/main') {
-                    sh """
-                    docker rmi ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-app:${env.BUILD_NUMBER} || true
-                    docker rmi ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-nginx:${env.BUILD_NUMBER} || true
+                    bat """
+                    docker rmi ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-app:${env.BUILD_NUMBER} || echo "Image not found"
+                    docker rmi ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-nginx:${env.BUILD_NUMBER} || echo "Image not found"
                     """
                 }
             }
@@ -138,8 +157,8 @@ pipeline {
             echo "Pipeline execution failed"
         }
         cleanup {
-            // Очистка dangling images
-            sh 'docker image prune -f'
+            // Очистка dangling images для Windows
+            bat 'docker image prune -f'
         }
     }
 }
