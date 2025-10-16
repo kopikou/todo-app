@@ -7,7 +7,7 @@ todos = []
 def index():
     # Получаем параметры фильтрации из URL
     search_query = request.args.get('search', '')
-    filter_status = request.args.get('filter', 'all')  # all, active, completed
+    filter_status = request.args.get('filter', 'all') 
     
     filtered_todos = todos.copy()
     

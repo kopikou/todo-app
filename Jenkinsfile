@@ -77,11 +77,6 @@ pipeline {
                         docker push ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-app:${env.BUILD_NUMBER}
                         docker push ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-nginx:${env.BUILD_NUMBER}
                         
-                        // Также пушим latest теги
-                        docker tag ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-app:${env.BUILD_NUMBER} ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-app:latest
-                        docker tag ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-nginx:${env.BUILD_NUMBER} ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-nginx:latest
-                        docker push ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-app:latest
-                        docker push ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-nginx:latest
                         """
                     }
                 }
@@ -145,7 +140,7 @@ pipeline {
         always {
             echo "Pipeline execution completed for branch: ${env.GIT_BRANCH}"
             script {
-                // Очистка: удаляем локальные образы 
+                // удаляем локальные образы 
                 if (env.GIT_BRANCH != 'origin/main') {
                     bat """
                     docker rmi ${env.DOCKER_REGISTRY}/${env.PROJECT_NAME}-app:${env.BUILD_NUMBER} || echo "Image not found"
